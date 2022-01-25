@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cr-status-checker
+spec:
+  template:
+    spec:
+      serviceAccountName: cr-status-checker
+      containers:
+      - image: "cr-status-checker:v0.0.1"
+        name: cr-status-checker
+        env:
+        - name: CUSTOM_RESOURCE_PATH
+          value: "apis/pulumi.com/v1/namespaces/default/stacks" # The URL path to the Kubernetes CRD object / custom resource after https://kubernetes.default.svc/<CUSTOM_RESOURCE_PATH>
+        - name: STATE_KEY
+          value: ".items[].status.lastUpdate.state" # The JSON path to the property containing the expected state
+        - name: STATE_VALUE
+          value: "succeeded" # Expected state when the Kubernetes CRD object / custom resource is created and ready to use
+      restartPolicy: OnFailure
+  backoffLimit: 300
