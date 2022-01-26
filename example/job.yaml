@@ -2,6 +2,9 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: cr-status-checker
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
 spec:
   template:
     spec:
@@ -11,10 +14,10 @@ spec:
         name: cr-status-checker
         env:
         - name: CUSTOM_RESOURCE_PATH
-          value: "apis/pulumi.com/v1/namespaces/default/stacks" # The URL path to the Kubernetes CRD object / custom resource after https://kubernetes.default.svc/<CUSTOM_RESOURCE_PATH>
+          value: "apis/pulumi.com/v1/namespaces/default/stacks"
         - name: STATE_KEY
-          value: ".items[].status.lastUpdate.state" # The JSON path to the property containing the expected state
+          value: ".items[].status.lastUpdate.state"
         - name: STATE_VALUE
-          value: "succeeded" # Expected state when the Kubernetes CRD object / custom resource is created and ready to use
+          value: "succeeded"
       restartPolicy: OnFailure
   backoffLimit: 300
